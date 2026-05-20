@@ -43,7 +43,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+// HTTPS redirect breaks CORS preflight (OPTIONS → 307) when frontend calls http://localhost:5153.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowFrontend");
 
@@ -51,6 +55,21 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+// Apply pending migrations in Development (e.g. Customers table).
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<BillingDbContext>();
+    db.Database.Migrate();
+}
 
-app.Run($"http://0.0.0.0:{port}");
+// Use PORT in Docker/production; otherwise launchSettings (http://localhost:5153 in dev).
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    app.Run($"http://0.0.0.0:{port}");
+}
+else
+{
+    app.Run();
+}
