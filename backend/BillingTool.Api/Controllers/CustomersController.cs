@@ -61,4 +61,32 @@ public class CustomersController(BillingDbContext db) : ControllerBase
         var created = new Customer(entity.Id, entity.Name, entity.Address, entity.Gstin);
         return CreatedAtAction(nameof(Search), new { q = entity.Name, limit = 1 }, created);
     }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateCustomerRequest request)
+    {
+        var name = request.Name.Trim();
+        var address = request.Address.Trim();
+        var gstin = request.Gstin.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+            return BadRequest("Customer name is required.");
+
+        var entity = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
+        if (entity is null)
+            return NotFound("Customer not found.");
+
+        var duplicateExists = await _db.Customers.AnyAsync(c =>
+            c.Id != id && c.Name.ToLower() == name.ToLower());
+        if (duplicateExists)
+            return Conflict("Another customer with this name already exists.");
+
+        entity.Name = name;
+        entity.Address = address;
+        entity.Gstin = gstin;
+        await _db.SaveChangesAsync();
+
+        var updated = new Customer(entity.Id, entity.Name, entity.Address, entity.Gstin);
+        return Ok(updated);
+    }
 }
