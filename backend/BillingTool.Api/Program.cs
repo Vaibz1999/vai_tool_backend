@@ -35,8 +35,10 @@ builder.Services.AddSwaggerGen();
 // Database - Supabase PostgreSQL
 // ---------------------------------------------------------
 builder.Services.AddDbContext<BillingDbContext>(options =>
+{
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 // ---------------------------------------------------------
 // CORS
@@ -46,9 +48,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins(
-                "https://billing-frontend.vercel.app"
-            )
+            .WithOrigins("https://billing-frontend.vercel.app")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -66,15 +66,13 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 // ---------------------------------------------------------
-// HTTPS
+// Routing
 // ---------------------------------------------------------
-// DO NOT use UseHttpsRedirection() on Render.
-// Render handles HTTPS termination.
-// The container listens on HTTP internally.
-// ---------------------------------------------------------
+app.UseRouting();
 
 // ---------------------------------------------------------
 // CORS
+// IMPORTANT: Must be before Authorization and Controllers
 // ---------------------------------------------------------
 app.UseCors("AllowFrontend");
 
@@ -90,9 +88,7 @@ app.MapControllers();
 
 // ---------------------------------------------------------
 // Database migrations
-// ---------------------------------------------------------
-// Only run migrations locally during Development.
-// Supabase schema has already been created.
+// Only run automatically in Development
 // ---------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
