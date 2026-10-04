@@ -48,14 +48,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("https://billing-frontend.vercel.app")
+            .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
 // ---------------------------------------------------------
-// Build application
+// Build
 // ---------------------------------------------------------
 var app = builder.Build();
 
@@ -72,7 +72,6 @@ app.UseRouting();
 
 // ---------------------------------------------------------
 // CORS
-// IMPORTANT: Must be before Authorization and Controllers
 // ---------------------------------------------------------
 app.UseCors("AllowFrontend");
 
@@ -87,8 +86,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ---------------------------------------------------------
-// Database migrations
-// Only run automatically in Development
+// Database migrations - Development only
 // ---------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
