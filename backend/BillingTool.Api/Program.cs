@@ -6,65 +6,109 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     Args = args
 });
 
-// ✅ Disable reloadOnChange in production
+// ---------------------------------------------------------
+// Configuration
+// ---------------------------------------------------------
 builder.Configuration.Sources.Clear();
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddJsonFile(
+        "appsettings.json",
+        optional: false,
+        reloadOnChange: false)
     .AddJsonFile(
         $"appsettings.{builder.Environment.EnvironmentName}.json",
         optional: true,
         reloadOnChange: false)
     .AddEnvironmentVariables();
 
+// ---------------------------------------------------------
+// Controllers
+// ---------------------------------------------------------
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ---------------------------------------------------------
+// Database - Supabase PostgreSQL
+// ---------------------------------------------------------
 builder.Services.AddDbContext<BillingDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ---------------------------------------------------------
+// CORS
+// ---------------------------------------------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "https://billing-frontend.vercel.app"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
+// ---------------------------------------------------------
+// Build application
+// ---------------------------------------------------------
 var app = builder.Build();
 
+// ---------------------------------------------------------
+// Swagger
+// ---------------------------------------------------------
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// HTTPS redirect breaks CORS preflight (OPTIONS → 307) when frontend calls http://localhost:5153.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// ---------------------------------------------------------
+// HTTPS
+// ---------------------------------------------------------
+// DO NOT use UseHttpsRedirection() on Render.
+// Render handles HTTPS termination.
+// The container listens on HTTP internally.
+// ---------------------------------------------------------
 
+// ---------------------------------------------------------
+// CORS
+// ---------------------------------------------------------
 app.UseCors("AllowFrontend");
 
+// ---------------------------------------------------------
+// Authorization
+// ---------------------------------------------------------
 app.UseAuthorization();
 
+// ---------------------------------------------------------
+// Controllers
+// ---------------------------------------------------------
 app.MapControllers();
 
-// Apply pending migrations in Development (e.g. Customers table).
+// ---------------------------------------------------------
+// Database migrations
+// ---------------------------------------------------------
+// Only run migrations locally during Development.
+// Supabase schema has already been created.
+// ---------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<BillingDbContext>();
+
+    var db = scope.ServiceProvider
+        .GetRequiredService<BillingDbContext>();
+
     db.Database.Migrate();
 }
 
-// Use PORT in Docker/production; otherwise launchSettings (http://localhost:5153 in dev).
+// ---------------------------------------------------------
+// Render PORT
+// ---------------------------------------------------------
 var port = Environment.GetEnvironmentVariable("PORT");
+
 if (!string.IsNullOrEmpty(port))
 {
     app.Run($"http://0.0.0.0:{port}");
