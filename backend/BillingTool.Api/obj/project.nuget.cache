@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2ahMoD9Ou0I=",
+  "dgSpecHash": "OJgxaJ7tElQ=",
   "success": true,
-  "projectFilePath": "D:\\vaibhav\\BillingTool\\backend\\BillingTool.Api\\BillingTool.Api.csproj",
+  "projectFilePath": "D:\\vaibhav\\BillingTool\\backend\\BillingTool.Api\\backend\\BillingTool.Api\\BillingTool.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Vaibhav\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
@@ -48,6 +48,8 @@
     "C:\\Users\\Vaibhav\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
+    "C:\\Users\\Vaibhav\\.nuget\\packages\\npgsql\\8.0.0\\npgsql.8.0.0.nupkg.sha512",
+    "C:\\Users\\Vaibhav\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\8.0.0\\npgsql.entityframeworkcore.postgresql.8.0.0.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\swashbuckle.aspnetcore\\10.1.7\\swashbuckle.aspnetcore.10.1.7.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\10.1.7\\swashbuckle.aspnetcore.swagger.10.1.7.nupkg.sha512",
     "C:\\Users\\Vaibhav\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\10.1.7\\swashbuckle.aspnetcore.swaggergen.10.1.7.nupkg.sha512",
